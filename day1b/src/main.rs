@@ -1,6 +1,6 @@
 fn main() {
-    let mut elves = Vec::<i32>::new();
-    let mut acc: i32 = 0;
+    let mut elves = Vec::<u32>::new();
+    let mut acc: u32 = 0;
     let lines = include_str!("../input.txt").lines();
 
     for line in lines {
@@ -8,12 +8,12 @@ fn main() {
             elves.push(acc);
             acc = 0
         } else {
-            acc += line.parse::<i32>().unwrap();
+            acc += line.parse::<u32>().unwrap();
         }
     }
 
     elves.sort_by(|a, b| b.partial_cmp(a).unwrap());
 
-    let top: Vec<i32> = elves[0..3].to_vec();
-    println!("{}", top.iter().sum::<i32>());
+    let top: Vec<u32> = elves[0..3].to_vec();
+    println!("{}", top.iter().sum::<u32>());
 }
