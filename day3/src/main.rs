@@ -1,31 +1,51 @@
-fn get_union(line: &str) -> u32 {
-    let size = line.chars().count();
-    let anchor = size / 2;
-    let first = line[0..anchor].to_string();
-    let second = line[anchor..size].to_string();
+use itertools::Itertools;
 
-    let letters: Vec<char> = first.chars().collect();
-    let mut value: u32 = 0;
-    for letter in letters {
-        if second.contains(letter) {
-            if letter.is_lowercase() {
-                value = letter as u32 - 96;
-            } else {
-                value = letter as u32 - 64 + 26;
-            }
-        }
-    }
-    return value;
+fn item_priority(item: char) -> u64 {
+    const CHARS: [char; 52] = [
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    ];
+    CHARS.iter().position(|i| i == &item).unwrap() as u64 + 1
+}
+
+fn common_chars(a: &str, b: &str) -> Vec<char> {
+    a.chars()
+        .filter(|ac| b.chars().contains(ac))
+        .unique()
+        .collect_vec()
 }
 
 fn main() {
-    let lines = include_str!("../input.txt").split("\n");
+    let sum: u64 = include_str!("../input.txt")
+        .lines()
+        .map(|l| {
+            let len = l.len();
+            let (first, second) = l.split_at(len / 2);
+            let common = common_chars(first, second);
+            common.iter().map(|c| item_priority(*c)).sum::<u64>()
+        })
+        .sum();
     // .map(|line| line.split("\n").flat_map(|num| num.parse::<u32>()).sum())
     // split on blank lines
-    let mut sum: u32 = 0;
-    for line in lines.clone().into_iter() {
-        sum += get_union(&line);
-    }
 
     println!("part1: {}", sum);
+
+    let sum2: u64 = include_str!("../input.txt")
+        .lines()
+        .tuples()
+        .into_iter()
+        .map(|(a, b, c)| {
+            let ab = common_chars(a, b);
+            let ac = common_chars(a, c);
+            let abc = ab
+                .iter()
+                .filter(|ab_char| ac.contains(&ab_char))
+                .unique()
+                .collect_vec();
+            item_priority(**abc.first().unwrap())
+        })
+        .sum();
+    println!("{:?}", sum);
+    println!("{:?}", sum2);
 }
